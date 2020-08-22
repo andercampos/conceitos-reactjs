@@ -13,23 +13,21 @@ function App() {
   }, []);
 
   async function handleAddRepository() {
-    const response = await api.post('repositories');
+    const response = await api.post('repositories', {
+      title: 'Anderson',
+      url: 'https://github.com/andercampos',
+      techs: ['Node.js', 'ReactJS']
+    });
 
-    const repository = response.data;
-
-    setRepositories([...repositories, repository]);
+    setRepositories([...repositories, response.data]);
   }
 
   async function handleRemoveRepository(id) {
-    const repositoryIndex = repositories.findIndex(repository => repository.id === id);
+    await api.delete(`repositories/${id}`);
 
-    if (repositoryIndex >= 0) {
-      await api.delete(`repositories/${repositories[repositoryIndex].id}`);
+    const repository = repositories.filter(repository => repository.id !== id);
 
-      const repository = repositories.filter(repository => repository.id !== id);
-
-      setRepositories([...repository]); 
-    }
+    setRepositories([...repository]); 
   }
 
   return (
@@ -39,7 +37,7 @@ function App() {
         <li key={repository.id}>
           {repository.title}
         
-          <button onClick={() => handleRemoveRepository(`${repository.id}`)}>
+          <button onClick={() => handleRemoveRepository(repository.id)}>
             Remover
           </button>
         </li>
